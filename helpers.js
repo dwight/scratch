@@ -11,8 +11,9 @@ function attempt(f) {
     }
     catch (e) {
         if (isObject(e) && e.message)
-            print(e.message);
+            print("  exception: " + e.message);
         else {
+            print("exception:");
             printjson(e);
         }
     }
@@ -36,6 +37,10 @@ cluster._conn = function (h) {
         p[h] = k;
     }
     return p[h];
+}
+
+ServerList.prototype.length = function () {
+    return this.list.length;
 }
 
 ServerList.prototype.get = function (x) {
@@ -73,6 +78,12 @@ ServerList.prototype.status = function () {
         }
         var server = thing._id;
         res[server] = cluster._serverStatus(server);
+        if( thing.type == "configsvr" ) {
+            res[server].chunks = null;
+            attempt( function() { 
+                res[server].chunks = cluster._conn(server).getSisterDB("config").chunks.count();
+            });
+        }
     });
     return res;
 }
@@ -102,7 +113,7 @@ cluster.configs = function () {
     check("not connected to a mongos / sharded cluster", o.isdbgrid);
     return new ServerList( 
       o.configserver.split(',').map(
-        function(x) { return { _id : x }; }
+        function(x) { return { _id : x, type:'configsvr' }; }
       )
     );
 }
@@ -224,13 +235,23 @@ cluster.ps = function () {
         s = '  ';
         //if (prefix) s += prefix;
         s += svr;
-        if (x) {
-            output(x.millisToRespond + "ms");
-            if (x.setName)
+        if (friendlyEqual(x, {})) {
+            output("???");
+        }
+        else if (x) {
+            if (isNumber(x.millisToRespond)) {
+                output(x.millisToRespond + "ms");
+            } else {
+                print("millisToRespond not set, dump:");
+                printjson(x);
+                output("?");
+            }
+            if (x.setName) {
                 output(x.setName);
+            }
             if (!x.ismaster) {
                 if (x.secondary) {
-                    output("secondary");
+                    output("SECONDARY");
                     sayLag(svr);
                 }
                 else {
@@ -240,12 +261,15 @@ cluster.ps = function () {
             }
             else {
                 if (x.setName) {
-                    output("primary  ");
+                    output("PRIMARY  ");
                     sayLag(svr);
                 }
                 else {
                     output("ok");
                 }
+            }
+            if (x.chunks) {
+                output(x.chunks);
             }
         }
         print(s);
@@ -282,25 +306,62 @@ cluster.ps.help = function () {
     print();
     print("This helper provides general info on the state and health of a sharded cluster.");
     print();
-    print("Config servers:\There are the config servers for your sharded cluster; for production you should have 3.");
+    print("The number suffixed with 'ms' is the number of milliseconds measured to send a");
+    print("command from this PC to the server in question. A high number might indicate");
+    print("an overloaded server (keep in mind any network latency (which is valid) to the");
+    print("node in question from this PC though.");
     print();
-    print("The number suffixed with 'ms' is the number of milliseconds measured to send a command from this PC");
-    print("to the member in question. A high number might indicate an overloaded server (keep in mind any network");
-    print("latency (which is valid) to the node in question from this PC though.");
+    print("Config servers");
+    print("--------------");
+    print("Lists some details on the config servers for your sharded cluster.");
     print();
-    print("Shards:");
-    print("The optime field indicates how far in the past from this PC's date/time the 'optime' is for the indicated");
-    print("replica set member. Normally lag would indicate that a secondary is 'falling behind' and not keeping up");
-    print("with its primary. However if there have been no writes to the shard, the number is then simply how long");
-    print("it has been since any write has occurred on that shard. Also clocks may vary. Compare the number to the optime");
-    print("value for the replica set primary to get an accurate depiction of the lag. The optime relative to 'now' is ");
-    print("shown to provide some context in case the primary is offline when cluster.ps() is invoked.");
+    print("The number after 'ok' is the number of chunks the config server is aware of.");
+    print("This number should agree amoung the config servers else something is wrong.");
+    print("Note however that this shell script is querying the config servers one by one;");
+    print("thus the output here is not a true snapshot so a tiny variation might be ok;");
+    print("if you see that, try running this method or cluster.configs().status()");
+    print("several times to verify that the number of chunks eventually converges in");
+    print("this script's sampling.");
+    print();
+    print("Shards");
+    print("------");
+    print("The optime field indicates how far in the past from this PC's date/time the");
+    print("'optime' is for the indicated replica set member. Normally lag would indicate");
+    print("that a secondary is 'falling behind' and not keeping up with its primary.");
+    print("However if there have been no writes to the shard, the number is then simply");
+    print("how long it has been since any write has occurred on that shard. Also clocks");
+    print("may vary. Compare the number to the optime value for the replica set primary");
+    print("to get an accurate depiction of the lag. The optime relative to 'now' is ");
+    print("shown to provide some context in case the primary is offline when cluster.ps()");
+    print("is invoked.");
+    print();
+    print("mongos");
+    print("------");
+    print("This is a list of currently active mongos processes for the cluster, with their");
+    print("status.");
+    print();
+}
+
+ServerList.prototype.help = function () {
+    print();
+    print("Certain methods under var 'cluster' (see cluster.help()) return a");
+    print("ServerList object.  For example cluster.mongos().");
+    print();
+    print("ServerList methods:");
+    print("  ServerList.length()          number of servers in the 'list'");
+    print("  ServerList.get(i)            get a connection to server i.");
+    print("  ServerList.status()          return status of all servers in the list");
+    print();
+    print("Examples:");
+    print("  cluster.configs().status()");
+    print("  cluster.primaries().get(0).runCommand(\"serverStatus\")");
     print();
 }
 
 cluster.help = function () {
-    print("\nHelp");
+    print("connect to a mongos to use these helpers");
     print();
+    print("  cluster.ps()                 print some summary info on the cluster");
     print("  cluster.shards()             detail each shard");
     print();
     print("These return a 'ServerList' object:");
@@ -313,6 +374,7 @@ cluster.help = function () {
     print("ServerList methods:");
     print("  x.status()");
     print("  x.list");
+    print("  x.length()");
     print("  x.get(n)                     return a DBConnection to the nth server in list");
     print();
     print("Examples:");
