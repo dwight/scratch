@@ -64,8 +64,117 @@ cluster._runCommand = function (server, command) {
     return o;
 }
 
+function repeat(f, secs) {
+    while (1) {
+        f();
+        if (!secs)
+            break;
+        print();
+        sleep(secs * 1000);
+    }
+}
+
+function pivot(x, secs) {
+    repeat(function () { _pivot(x); }, secs);
+} 
+
+function _pivot(x) {
+    var line = "";
+    function out() {
+        print(line);
+        line = "";
+    }
+    function pad(s, n) {
+        if (s != null)
+            s = "" + s;
+        else 
+            s = "-";
+        n = n || 30;
+        line += s;
+        for (var i = s.length; i < n; i++)
+            line += ' ';
+    }
+    pad("");
+    var fields = {};
+    for (var i in x) {
+        pad(i,13);
+        var o = x[i];
+        for (var j in o) {
+            fields[j] = 1;
+        }
+    }
+    out();
+    for (var f in fields) {
+        pad(f);
+        for (var h in x) {
+/*            print(h);
+            print(f);
+            print(x[h][f]);*/
+            pad(x[h][f],13);
+        }
+        out();
+    }
+}
+
 cluster._serverStatus = function (server) {
     return cluster._runCommand(server, "isMaster");
+}
+
+ServerList.prototype.ss = function (project) {
+    return this.forEach(function (x) { return x.serverStatus()[project]; });
+}
+
+ServerList.prototype.version = function () {
+    return this.forEach(function (x) {
+        var o = x.serverStatus();
+        return { version: o.version, host: o.host, process: o.process, uptime: o.uptime };
+    }
+    );
+}
+
+ServerList.prototype.conns = function () {
+    return this.ss("connections");
+}
+
+ServerList.prototype.mem = function () {
+    return this.forEach(function (x) {
+        var o = x.serverStatus().mem;
+        delete o.supported;
+        if (o.bits == 64)
+            delete o.bits; // densify
+        return o;
+    }
+    );
+}
+
+ServerList.prototype.forEach = function (f) {
+    var L = this.list;
+    var res = {};
+    L.forEach(function (server) {
+        if (!server || !server._id) {
+            print("ServerList: missing server obj/id???");
+            return;
+        }
+        var name = server._id;
+        try {
+            var connection = cluster._conn(name);
+            var result = f(connection);
+            if (isObject(result))
+                res[name] = result;
+            else
+                res[name] = { result: result };
+        }
+        catch (e) {
+            if (!res[name])
+                res[name] = {};
+            res[name].errInvoking = e;
+        }
+        if (server.shard || server.shard == 0)
+            res[name].shard = server.shard;
+        if (server.type)
+            res[name].type = server.type;
+    });
+    return res;
 }
 
 ServerList.prototype.status = function () {
@@ -351,6 +460,12 @@ ServerList.prototype.help = function () {
     print("  ServerList.length()          number of servers in the 'list'");
     print("  ServerList.get(i)            get a connection to server i.");
     print("  ServerList.status()          return status of all servers in the list");
+    print("  ServerList.forEach(func)     invoke func on our db connection to each server");
+    print("  ServerList.ss(field)         return specified field from serverStatus for each");
+    print();
+    print("  ServerList.version()");
+    print("  ServerList.mem()");
+    print("  ServerList.conns()");
     print();
     print("Examples:");
     print("  cluster.configs().status()");
@@ -376,12 +491,17 @@ cluster.help = function () {
     print("  x.list");
     print("  x.length()");
     print("  x.get(n)                     return a DBConnection to the nth server in list");
+    print("  x.ss(field)");
+    print("  x.help()                     shows many more");
     print();
     print("Examples:");
     print("  cluster.configs().status()");
     print("  cluster.mongos().get(0).serverStatus()");
-    print('  cluster.mongod().get(2)._adminCommand("replSetGetStatus");');
+    print('  cluster.mongod().get(2)._adminCommand("replSetGetStatus")');
     print('  cluster.primaries().get(0).getSisterDB("test").stats()');
+    print('  cluster.all().ss("a_field_name")');
+    print('  cluster.all().mem()');
+    print('  pivot(cluster.all().mem(), 3)');
     print();
 }
 
