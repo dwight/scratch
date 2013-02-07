@@ -337,7 +337,7 @@ cluster.ps = function () {
     function sayLag(hostname) {
         var L = getLag(hostname);
         if (L >= 1) {
-            output("optime:now-" + ago(L));
+            output("optime:n-" + ago(L));
         }
     }
     function say(svr, x, prefix) {
@@ -378,7 +378,7 @@ cluster.ps = function () {
                 }
             }
             if (x.chunks) {
-                output(x.chunks);
+                output(x.chunks+"chunks");
             }
         }
         print(s);
