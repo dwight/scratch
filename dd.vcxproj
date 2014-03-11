@@ -1,0 +1,1057 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- header for use with make_vcxproj.py
+    
+     Note that once you generate the vcxproj file, if you change it in visual studio, when it 
+     writes it back out you will use the comments and semi-neat formatting below.
+-->
+
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Win2008PlusDebug|Win32">
+      <Configuration>Win2008PlusDebug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Win2008PlusDebug|x64">
+      <Configuration>Win2008PlusDebug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Win2008PlusRelease|Win32">
+      <Configuration>Win2008PlusRelease</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Win2008PlusRelease|x64">
+      <Configuration>Win2008PlusRelease</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+
+  <PropertyGroup Label="Globals">
+    <ProjectName>mongod</ProjectName>
+    <!-- <ProjectGuid>{215B2D68-0A70-4D10-8E75-B31010C62A91}</ProjectGuid> -->
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>mongod</RootNamespace>
+  </PropertyGroup>
+
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+
+  <PropertyGroup Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+
+<!-- given we do final official build with scons, it is reasonable to consider leaving this off for better
+     compile speed during development:
+-->
+<!--
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Win2008PlusRelease|Win32'" Label="Configuration">
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Win2008PlusRelease|x64'" Label="Configuration">
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+-->
+
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <OutDir>$(ProjectDir)$(Platform)\$(Configuration)\</OutDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Win2008PlusDebug|Win32'">true</LinkIncremental>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</LinkIncremental>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Win2008PlusDebug|x64'">true</LinkIncremental>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Win2008PlusRelease|Win32'">false</LinkIncremental>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkIncremental>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Win2008PlusRelease|x64'">false</LinkIncremental>
+    <CodeAnalysisRuleSet >AllRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+
+  <!-- GLOBAL SETTINGS ALL BUILD STYLES -->
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <ObjectFileName>%(RelativeDir)/</ObjectFileName>
+      <AdditionalIncludeDirectories>src;src\mongo;src\third_party\v8\include;src\third_party\pcre-8.30;src\third_party\boost;src\third_party\snappy;src\third_party\s2;src\third_party\yaml-cpp-0.5.1\include</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>NTDDI_VERSION=0x06010000;_WIN32_WINNT=0x0601;WIN32;XP_WIN;%(PreprocessorDefinitions)</PreprocessorDefinitions>    
+      <!-- above is temp - NTDDI etc. should be configurable, not finished yet, this gets us compiling some for now. 
+         <PreprocessorDefinitions>WIN32;XP_WIN;%(PreprocessorDefinitions)</PreprocessorDefinitions>    
+      -->
+      <DisableSpecificWarnings>4355;4800;4267;4244;4351</DisableSpecificWarnings>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <MinimalRebuild>No</MinimalRebuild>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+      <AdditionalDependencies>winmm.lib;ws2_32.lib;psapi.lib;dbghelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+
+  <!-- DEBUG -->
+  <ItemDefinitionGroup Condition="'$(Configuration)'=='Debug' Or '(Configuration)'=='Win2008PlusDebug'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PreprocessorDefinitions>_DEBUG;DEBUG;OBJECT_PRINT;ENABLE_DISASSEMBLER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <!--<DebugInformationFormat>EditAndContinue</DebugInformationFormat>-->
+    </ClCompile>
+  </ItemDefinitionGroup>
+
+ <!-- RELEASE -->
+  <ItemDefinitionGroup Condition="'$(Configuration)'=='Release' Or '(Configuration)'=='Win2008PlusRelease'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+    </ClCompile>
+  </ItemDefinitionGroup>
+
+  <!-- X64 -->
+  <ItemDefinitionGroup Condition="'$(Platform)'=='x64'">
+    <ClCompile>
+      <PreprocessorDefinitions>V8mongodARCH_X64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+
+  <!-- 32 bit -->
+  <ItemDefinitionGroup Condition="'$(Platform)'=='Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>V8mongodARCH_IA32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <TargetMachine>MachineX86</TargetMachine>
+      <LargeAddressAware>true</LargeAddressAware>
+    </Link>
+  </ItemDefinitionGroup>
+
+<!-- temp commented out, not working yet
+-->
+  <!-- SRW / Windows2008+ -->
+<!--
+  <ItemDefinitionGroup Condition="'$(Configuration)'=='Win2008PlusRelease' Or '(Configuration)'=='Win2008PlusDebug'">
+    <ClCompile>
+      <PreprocessorDefinitions>NTDDI_VERSION=0x06010000;_WIN32_WINNT=0x0601;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+-->
+  <!-- legacy -->
+<!--
+  <ItemDefinitionGroup Condition="'$(Configuration)'=='Release' Or '(Configuration)'=='Debug'">
+    <ClCompile>
+      <PreprocessorDefinitions>NTDDI_VERSION=0x05020200;_WIN32_WINNT=0x0502;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+-->
+
+   <!-- SPECIFICS -->
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Link>
+      <!-- this is likely unnecessary and should be removed, but was in the old vcxproj: -->
+      <IgnoreSpecificDefaultLibraries>msvcrtd;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Win2008PlusDebug|Win32'">
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Win2008PlusDebug|x64'">
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Win2008PlusRelease|Win32'">
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Win2008PlusRelease|x64'">
+  </ItemDefinitionGroup>
+
+<!--
+  <ItemDefinitionGroup>
+    <PreBuildEvent>
+      <Command>cscript //Nologo "src\third_party\run_if_newer.js" /path:"$(ProjectDir)..\base" /input:"generate_error_codes.py,error_codes.err" /output:"error_codes.h,error_codes.cpp" /command:"python generate_error_codes.py error_codes.err error_codes.h error_codes.cpp"
+cscript //Nologo "$(ProjectDir)..\..\third_party\run_if_newer.js" /path:"$(ProjectDir)..\db\auth" /input:"generate_action_types.py,action_types.txt" /output:"action_type.h,action_type.cpp" /command:"python generate_action_types.py action_types.txt action_type.h action_type.cpp"
+cscript //Nologo "$(ProjectDir)..\..\third_party\run_if_newer.js" /path:"$(ProjectDir)..\..\third_party\v8" /input:"tools\js2c.py,src\proxy.js,src\collection.js,src\macros.py" /output:"src\experimental-libraries.cc" /command:"python tools\js2c.py src/experimental-libraries.cc EXPERIMENTAL off src/proxy.js src/collection.js src/macros.py"
+cscript //Nologo "$(ProjectDir)..\..\third_party\run_if_newer.js" /path:"$(ProjectDir)..\..\third_party\v8" /input:"tools\js2c.py,src/runtime.js,src/v8natives.js,src/array.js,src/string.js,src/uri.js,src/math.js,src/messages.js,src/apinatives.js,src/date.js,src/regexp.js,src/json.js,src/liveedit-debugger.js,src/mirror-debugger.js,src/debug-debugger.js,src\macros.py" /output:"src\libraries.cc" /command:"python tools\js2c.py src/libraries.cc CORE off src/runtime.js src/v8natives.js src/array.js src/string.js src/uri.js src/math.js src/messages.js src/apinatives.js src/date.js src/regexp.js src/json.js src/liveedit-debugger.js src/mirror-debugger.js src/debug-debugger.js src\macros.py"
+cscript //Nologo "$(ProjectDir)..\..\third_party\run_if_newer.js" /path:"$(ProjectDir)..\db\fts" /input:"generate_stop_words.py,stop_words_danish.txt,stop_words_dutch.txt,stop_words_english.txt,stop_words_finnish.txt,stop_words_french.txt,stop_words_german.txt,stop_words_hungarian.txt,stop_words_italian.txt,stop_words_norwegian.txt,stop_words_portuguese.txt,stop_words_romanian.txt,stop_words_russian.txt,stop_words_spanish.txt,stop_words_swedish.txt,stop_words_turkish.txt" /output:"stop_words_list.h,stop_words_list.cpp" /command:"python generate_stop_words.py stop_words_danish.txt stop_words_dutch.txt stop_words_english.txt stop_words_finnish.txt stop_words_french.txt stop_words_german.txt stop_words_hungarian.txt stop_words_italian.txt stop_words_norwegian.txt stop_words_portuguese.txt stop_words_romanian.txt stop_words_russian.txt stop_words_spanish.txt stop_words_swedish.txt stop_words_turkish.txt stop_words_list.h stop_words_list.cpp"
+cscript //Nologo "$(ProjectDir)..\shell\createCPPfromJavaScriptFiles.js" "$(ProjectDir).."
+        </Command>
+      <Message>Run pre-build commands</Message>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+-->
+
+
+
+<!-- common_defines -->
+<ItemDefinitionGroup><ClCompile><PreprocessorDefinitions>
+MONGO_HAVE___DECLSPEC_THREAD;_WIN32_WINNT=0x0502;_CRT_SECURE_NO_WARNINGS;_CONSOLE;_UNICODE;UNICODE;SUPPORT_UTF8;MONGO_EXPOSE_MACROS;BOOST_ALL_NO_LIB;%(PreprocessorDefinitions)
+</PreprocessorDefinitions></ClCompile></ItemDefinitionGroup>
+
+<ItemGroup>
+
+    <ClCompile Include="src\mongo\db\db.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\commands\touch.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\mongod_options_init.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\client\auth_helpers.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\util\background.cpp"></ClCompile>
+    <ClCompile Include="build\win32\64\d\mongo\base\error_codes.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\base\global_initializer.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\base\global_initializer_registerer.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\base\init.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\base\initializer.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\base\initializer_context.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\base\initializer_dependency_graph.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\base\make_string_vector.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\base\parse_number.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\base\status.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\base\string_data.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\bson\mutable\document.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\bson\mutable\element.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\bson\util\bson_extract.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\util\safe_num.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\bson\bson_validate.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\bson\oid.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\bson\optime.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\jsobj.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\json.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\scripting\bson_template_evaluator.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\client\connpool.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\client\dbclient.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\client\dbclient_rs.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\client\dbclientcursor.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\client\replica_set_monitor.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\client\sasl_client_authenticate.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\client\syncclusterconnection.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\dbmessage.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\client\parallel.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\audit.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\commands.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\commands\authentication_commands.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\commands\connection_status.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\commands\copydb_common.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\commands\fail_point_cmd.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\commands\find_and_modify_common.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\commands\hashcmd.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\commands\isself.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\commands\mr_common.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\commands\rename_collection_common.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\commands\server_status.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\commands\shutdown.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\commands\parameters.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\commands\user_management_commands.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\commands\write_commands\write_commands_common.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\pipeline\pipeline.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\dbcommands_generic.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\keypattern.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\matcher\matcher.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\pipeline\accumulator_add_to_set.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\pipeline\accumulator_avg.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\pipeline\accumulator_first.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\pipeline\accumulator_last.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\pipeline\accumulator_min_max.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\pipeline\accumulator_push.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\pipeline\accumulator_sum.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\pipeline\dependencies.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\pipeline\document.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\pipeline\document_source.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\pipeline\document_source_bson_array.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\pipeline\document_source_command_shards.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\pipeline\document_source_geo_near.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\pipeline\document_source_group.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\pipeline\document_source_limit.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\pipeline\document_source_match.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\pipeline\document_source_merge_cursors.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\pipeline\document_source_out.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\pipeline\document_source_project.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\pipeline\document_source_redact.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\pipeline\document_source_skip.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\pipeline\document_source_sort.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\pipeline\document_source_unwind.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\pipeline\expression.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\pipeline\field_path.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\pipeline\value.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\projection.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\queryutil.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\stats\timer_stats.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\s\shardconnection.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\client_basic.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\util\net\miniwebserver.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\stats\counters.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\stats\service_stats.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\log_process_details.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\s\distlock.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\s\config.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\s\grid.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\s\chunk.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\s\config_server_checker_service.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\s\shard.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\s\shardkey.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\auth\action_set.cpp"></ClCompile>
+    <ClCompile Include="build\win32\64\d\mongo\db\auth\action_type.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\auth\authorization_manager.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\auth\authorization_session.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\auth\authz_documents_update_guard.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\auth\authz_manager_external_state.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\auth\authz_manager_external_state_local.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\auth\authz_session_external_state.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\auth\privilege.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\auth\privilege_parser.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\auth\resource_pattern.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\auth\role_graph.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\auth\role_graph_update.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\auth\role_name.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\auth\role_graph_builtin_roles.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\auth\user.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\auth\user_document_parser.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\auth\user_management_commands_parser.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\auth\user_name.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\auth\user_set.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\auth\authz_manager_external_state_d.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\auth\authz_session_external_state_d.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\auth\auth_index_d.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\auth\auth_server_parameters.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\auth\authorization_manager_global.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\auth\authz_session_external_state_server_common.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\auth\security_key.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\auth\mongo_authentication_session.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\field_ref.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\field_ref_set.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\field_parser.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\write_concern_options.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\exec\2d.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\exec\2dcommon.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\exec\2dnear.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\exec\and_hash.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\exec\and_sorted.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\exec\collection_scan.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\exec\count.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\exec\distinct_scan.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\exec\fetch.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\exec\index_scan.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\exec\keep_mutations.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\exec\limit.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\exec\merge_sort.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\exec\oplogstart.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\exec\or.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\exec\projection.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\exec\projection_exec.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\exec\s2near.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\exec\shard_filter.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\exec\skip.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\exec\sort.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\exec\stagedebug_cmd.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\exec\text.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\exec\working_set_common.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\exec\working_set.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\fts\fts_index_format.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\fts\fts_matcher.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\fts\fts_query.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\fts\fts_spec.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\fts\fts_spec_legacy.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\fts\fts_language.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\fts\fts_util.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\fts\fts_element_iterator.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\fts\stemmer.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\fts\stop_words.cpp"></ClCompile>
+    <ClCompile Include="build\win32\64\d\mongo\db\fts\stop_words_list.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\fts\tokenizer.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\fts\fts_command_mongod.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\fts\fts_command.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\fts\fts_enabled.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\index\btree_key_generator.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\index\expression_keys_private.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\ops\modifier_add_to_set.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\ops\modifier_bit.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\ops\modifier_compare.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\ops\modifier_current_date.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\ops\modifier_inc.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\ops\modifier_object_replace.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\ops\modifier_pop.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\ops\modifier_pull.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\ops\modifier_pull_all.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\ops\modifier_push.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\ops\modifier_rename.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\ops\modifier_set.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\ops\modifier_unset.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\ops\field_checker.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\ops\log_builder.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\ops\path_support.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\ops\modifier_table.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\ops\update_driver.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\query\index_bounds.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\query\index_bounds_builder.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\query\interval.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\query\lite_parsed_query.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\query\cached_plan_runner.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\query\eof_runner.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\query\explain_plan.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\query\get_runner.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\query\idhack_runner.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\query\internal_runner.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\query\multi_plan_runner.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\query\new_find.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\query\plan_executor.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\query\plan_ranker.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\query\single_solution_runner.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\query\stage_builder.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\query\type_explain.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\query\qlog.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\query\canonical_query.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\query\query_settings.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\query\index_tag.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\query\parsed_projection.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\query\plan_cache.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\query\plan_enumerator.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\query\planner_access.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\query\planner_analysis.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\query\planner_ixselect.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\query\query_planner.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\query\query_solution.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\query\query_planner_test_lib.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\s\default_version.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\matcher\expression.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\matcher\expression_array.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\matcher\expression_leaf.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\matcher\expression_tree.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\matcher\expression_parser.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\matcher\expression_parser_tree.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\matcher\matchable.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\matcher\match_details.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\matcher\expression_geo.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\matcher\expression_parser_geo.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\matcher\expression_text.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\matcher\expression_parser_text.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\matcher\expression_where.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\util\fail_point.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\util\fail_point_registry.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\util\fail_point_service.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\util\assert_util.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\util\concurrency\mutexdebugger.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\util\debug_util.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\util\exception_filter_win32.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\util\file.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\util\log.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\util\platform_init.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\util\signal_handlers.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\util\text.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\util\time_support.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\util\timer.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\util\util.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\util\startup_test.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\geo\hash.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\geo\shapes.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\geo\geoparser.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\geo\geoquery.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\catalog\index_key_validate.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\index_names.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\index_set.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\lasterror.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\logger\console.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\logger\log_manager.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\logger\log_severity.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\logger\logger.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\logger\logstream_builder.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\logger\message_event_utf8_encoder.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\logger\message_log_domain.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\logger\ramlog.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\logger\rotatable_file_manager.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\logger\rotatable_file_writer.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\util\md5.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\util\password_digest.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\util\net\message_server_port.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\pch.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\structure\catalog\namespace.cpp"></ClCompile>
+    <ClCompile Include="build\win32\64\d\mongo\shell\mongo.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\util\intrusive_counter.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\util\file_allocator.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\util\trace.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\util\paths.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\util\progress_meter.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\util\concurrency\task.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\util\concurrency\thread_pool.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\util\password.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\util\concurrency\rwlockimpl.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\util\histogram.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\util\text_startuptest.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\util\signal_win32.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\util\stack_introspect.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\util\version_reporting.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\mongod_options.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\initialize_server_global_state.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\server_extra_log_context.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\dbwebserver.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\clientlistplugin.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\repl\replset_web_handler.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\restapi.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\stats\snapshots_webplugins.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\hasher.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\util\net\sock.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\util\net\socket_poll.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\util\net\ssl_manager.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\util\net\ssl_options.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\util\net\httpclient.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\util\net\message.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\util\net\message_port.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\util\net\listen.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\util\ntservice.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\matcher\path.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\matcher\path_internal.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\platform\backtrace.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\platform\posix_fadvise.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\platform\process_id.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\platform\random.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\platform\strcasestr.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\util\processinfo.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\util\processinfo_win32.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\range_deleter.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\range_deleter_mock_env.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\range_deleter_stats.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\s\mongo_version_range.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\s\range_arithmetic.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\s\shard_key_pattern.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\s\type_changelog.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\s\type_chunk.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\s\type_collection.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\s\type_database.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\s\type_locks.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\s\type_lockpings.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\s\type_settings.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\s\type_shard.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\s\type_config_version.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\s\type_mongos.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\s\type_tags.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\s\write_ops\batched_command_request.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\s\write_ops\batched_command_response.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\s\write_ops\batched_delete_request.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\s\write_ops\batched_delete_document.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\s\write_ops\batched_insert_request.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\s\write_ops\batched_request_metadata.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\s\write_ops\batched_update_request.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\s\write_ops\batched_update_document.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\s\write_ops\batched_upsert_detail.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\s\write_ops\wc_error_detail.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\s\write_ops\write_error_detail.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\s\chunk_manager_targeter.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\s\cluster_write.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\s\dbclient_multi_command.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\s\dbclient_shard_resolver.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\s\write_ops\dbclient_safe_writer.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\s\write_ops\batch_upconvert.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\s\write_ops\batch_downconvert.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\s\write_ops\write_op.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\s\write_ops\batch_write_op.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\s\write_ops\batch_write_exec.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\s\write_ops\config_coordinator.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\s\collection_metadata.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\s\metadata_loader.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\scripting\engine.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\scripting\utils.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\scripting\bench.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\scripting\engine_v8.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\scripting\v8_db.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\scripting\v8_utils.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\scripting\v8_profiler.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\server_options_helpers.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\server_options.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\server_parameters.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\curop.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\kill_current_op.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\interrupt_status_mongod.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\d_globals.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\pagefault.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\util\compress.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\ttl.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\d_concurrency.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\lockstat.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\lockstate.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\structure\btree\key.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\structure\btree\btreebuilder.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\util\logfile.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\util\alignedbuilder.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\util\elapsed_tracker.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\util\touch_pages.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\storage\durable_mapped_file.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\dur.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\durop.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\dur_writetodatafiles.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\dur_preplogbuffer.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\dur_commitjob.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\dur_recover.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\dur_journal.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\introspect.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\structure\btree\btree.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\structure\btree\btree_stats.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\clientcursor.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\tests.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\range_deleter_db_env.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\range_deleter_service.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\repl\repl_start.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\repl\rs.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\repl\consensus.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\repl\rs_initiate.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\repl\replset_commands.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\repl\manager.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\repl\health.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\repl\heartbeat.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\repl\rs_config.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\repl\rs_rollback.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\repl\rs_sync.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\repl\rs_initialsync.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\repl\bgsync.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\repl\master_slave.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\repl\sync.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\repl\sync_source_feedback.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\repl\oplogreader.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\repl\replication_server_status.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\repl\repl_reads_ok.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\repl\resync.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\repl\oplog.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\prefetch.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\repl\write_concern.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\index_legacy.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\index\2d_access_method.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\index\btree_access_method.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\index\btree_based_access_method.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\index\btree_index_cursor.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\index\btree_interface.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\index\fts_access_method.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\index\hash_access_method.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\index\haystack_access_method.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\index\s2_access_method.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\cloner.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\structure\catalog\namespace_details.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\structure\catalog\namespace_index.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\structure\catalog\cap.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\dbeval.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\dbhelpers.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\instance.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\client.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\catalog\database.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\catalog\index_catalog.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\catalog\index_catalog.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\catalog\index_catalog_entry.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\catalog\index_create.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\catalog\collection.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\structure\collection_compact.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\catalog\collection_cursor_cache.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\catalog\collection_info_cache.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\structure\collection_iterator.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\catalog\database_holder.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\background.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\pdfile.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\repair_database.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\storage\data_file.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\storage\extent.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\storage\extent_manager.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\structure\catalog\index_details.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\structure\record_store.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\extsort.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\index_builder.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\index_rebuilder.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\storage\record.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\commands\geonear.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\geo\haystack.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\geo\s2common.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\ops\count.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\ops\delete.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\ops\insert.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\ops\update.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\ops\update_executor.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\dbcommands.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\dbcommands_admin.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\write_concern.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\startup_warnings.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\storage_options.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\ops\update_lifecycle_impl.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\stats\top.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\commands\apply_ops.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\commands\compact.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\commands\auth_schema_upgrade_d.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\commands\create_indexes.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\commands\dbhash.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\commands\merge_chunks_cmd.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\commands\cleanup_orphaned_cmd.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\commands\collection_to_capped.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\commands\drop_indexes.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\commands\fsync.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\commands\get_last_error.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\commands\write_commands\write_commands.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\commands\write_commands\batch_executor.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\commands\distinct.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\commands\find_and_modify.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\commands\group.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\commands\index_filter_commands.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\commands\index_stats.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\commands\mr.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\commands\oplog_note.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\commands\pipeline_command.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\commands\parallel_collection_scan.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\commands\plan_cache_commands.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\commands\rename_collection.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\commands\storage_details.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\commands\test_commands.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\commands\validate.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\pipeline\pipeline_d.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\pipeline\document_source_cursor.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\driverHelpers.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\util\mmap.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\util\mmap_win.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\db\stats\snapshots.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\s\d_logic.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\s\d_writeback.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\s\d_migrate.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\s\d_state.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\s\d_split.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\s\d_merge.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\s\distlock_test.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\util\concurrency\spin_lock.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\util\stacktrace.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\util\stringutils.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\util\base64.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\util\hex.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\util\concurrency\synchronization.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\util\cmdline_utils\censor_cmdline.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\util\concurrency\thread_name.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\util\options_parser\environment.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\util\options_parser\value.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\util\options_parser\constraints.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\util\options_parser\option_section.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\util\options_parser\option_description.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\util\options_parser\options_parser.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\util\options_parser\startup_option_init.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\util\options_parser\startup_options.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\util\options_parser\options_parser_init.cpp"></ClCompile>
+    <ClCompile Include="src\mongo\util\version.cpp"></ClCompile>
+    <ClCompile Include="src\third_party\boost\libs\filesystem\v2\src\v2_operations.cpp"></ClCompile>
+    <ClCompile Include="src\third_party\boost\libs\filesystem\v2\src\v2_path.cpp"></ClCompile>
+    <ClCompile Include="src\third_party\boost\libs\filesystem\v2\src\v2_portability.cpp"></ClCompile>
+    <ClCompile Include="src\third_party\boost\libs\filesystem\v3\src\codecvt_error_category.cpp"></ClCompile>
+    <ClCompile Include="src\third_party\boost\libs\filesystem\v3\src\operations.cpp"></ClCompile>
+    <ClCompile Include="src\third_party\boost\libs\filesystem\v3\src\path.cpp"></ClCompile>
+    <ClCompile Include="src\third_party\boost\libs\filesystem\v3\src\path_traits.cpp"></ClCompile>
+    <ClCompile Include="src\third_party\boost\libs\filesystem\v3\src\portability.cpp"></ClCompile>
+    <ClCompile Include="src\third_party\boost\libs\filesystem\v3\src\unique_path.cpp"></ClCompile>
+    <ClCompile Include="src\third_party\boost\libs\filesystem\v3\src\utf8_codecvt_facet.cpp"></ClCompile>
+    <ClCompile Include="src\third_party\boost\libs\filesystem\v3\src\windows_file_codecvt.cpp"></ClCompile>
+    <ClCompile Include="src\third_party\boost\libs\program_options\src\cmdline.cpp"></ClCompile>
+    <ClCompile Include="src\third_party\boost\libs\program_options\src\config_file.cpp"></ClCompile>
+    <ClCompile Include="src\third_party\boost\libs\program_options\src\convert.cpp"></ClCompile>
+    <ClCompile Include="src\third_party\boost\libs\program_options\src\options_description.cpp"></ClCompile>
+    <ClCompile Include="src\third_party\boost\libs\program_options\src\parsers.cpp"></ClCompile>
+    <ClCompile Include="src\third_party\boost\libs\program_options\src\positional_options.cpp"></ClCompile>
+    <ClCompile Include="src\third_party\boost\libs\program_options\src\split.cpp"></ClCompile>
+    <ClCompile Include="src\third_party\boost\libs\program_options\src\utf8_codecvt_facet.cpp"></ClCompile>
+    <ClCompile Include="src\third_party\boost\libs\program_options\src\value_semantic.cpp"></ClCompile>
+    <ClCompile Include="src\third_party\boost\libs\program_options\src\variables_map.cpp"></ClCompile>
+    <ClCompile Include="src\third_party\boost\libs\program_options\src\winmain.cpp"></ClCompile>
+    <ClCompile Include="src\third_party\boost\libs\system\src\error_code.cpp"></ClCompile>
+    <ClCompile Include="src\third_party\boost\libs\thread\src\win32\thread.cpp"><PreprocessorDefinitions>BOOST_THREAD_BUILD_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\boost\libs\thread\src\win32\tss_pe.cpp"><PreprocessorDefinitions>BOOST_THREAD_BUILD_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\libstemmer_c\runtime\api.c"></ClCompile>
+    <ClCompile Include="src\third_party\libstemmer_c\runtime\utilities.c"></ClCompile>
+    <ClCompile Include="src\third_party\libstemmer_c\libstemmer\libstemmer_utf8.c"></ClCompile>
+    <ClCompile Include="src\third_party\libstemmer_c\src_c\stem_ISO_8859_1_danish.c"></ClCompile>
+    <ClCompile Include="src\third_party\libstemmer_c\src_c\stem_ISO_8859_1_french.c"></ClCompile>
+    <ClCompile Include="src\third_party\libstemmer_c\src_c\stem_ISO_8859_1_norwegian.c"></ClCompile>
+    <ClCompile Include="src\third_party\libstemmer_c\src_c\stem_ISO_8859_1_swedish.c"></ClCompile>
+    <ClCompile Include="src\third_party\libstemmer_c\src_c\stem_UTF_8_dutch.c"></ClCompile>
+    <ClCompile Include="src\third_party\libstemmer_c\src_c\stem_UTF_8_german.c"></ClCompile>
+    <ClCompile Include="src\third_party\libstemmer_c\src_c\stem_UTF_8_porter.c"></ClCompile>
+    <ClCompile Include="src\third_party\libstemmer_c\src_c\stem_UTF_8_spanish.c"></ClCompile>
+    <ClCompile Include="src\third_party\libstemmer_c\src_c\stem_ISO_8859_1_dutch.c"></ClCompile>
+    <ClCompile Include="src\third_party\libstemmer_c\src_c\stem_ISO_8859_1_german.c"></ClCompile>
+    <ClCompile Include="src\third_party\libstemmer_c\src_c\stem_ISO_8859_1_porter.c"></ClCompile>
+    <ClCompile Include="src\third_party\libstemmer_c\src_c\stem_ISO_8859_2_romanian.c"></ClCompile>
+    <ClCompile Include="src\third_party\libstemmer_c\src_c\stem_UTF_8_english.c"></ClCompile>
+    <ClCompile Include="src\third_party\libstemmer_c\src_c\stem_UTF_8_hungarian.c"></ClCompile>
+    <ClCompile Include="src\third_party\libstemmer_c\src_c\stem_UTF_8_portuguese.c"></ClCompile>
+    <ClCompile Include="src\third_party\libstemmer_c\src_c\stem_UTF_8_swedish.c"></ClCompile>
+    <ClCompile Include="src\third_party\libstemmer_c\src_c\stem_ISO_8859_1_english.c"></ClCompile>
+    <ClCompile Include="src\third_party\libstemmer_c\src_c\stem_ISO_8859_1_hungarian.c"></ClCompile>
+    <ClCompile Include="src\third_party\libstemmer_c\src_c\stem_ISO_8859_1_portuguese.c"></ClCompile>
+    <ClCompile Include="src\third_party\libstemmer_c\src_c\stem_KOI8_R_russian.c"></ClCompile>
+    <ClCompile Include="src\third_party\libstemmer_c\src_c\stem_UTF_8_finnish.c"></ClCompile>
+    <ClCompile Include="src\third_party\libstemmer_c\src_c\stem_UTF_8_italian.c"></ClCompile>
+    <ClCompile Include="src\third_party\libstemmer_c\src_c\stem_UTF_8_romanian.c"></ClCompile>
+    <ClCompile Include="src\third_party\libstemmer_c\src_c\stem_UTF_8_turkish.c"></ClCompile>
+    <ClCompile Include="src\third_party\libstemmer_c\src_c\stem_ISO_8859_1_finnish.c"></ClCompile>
+    <ClCompile Include="src\third_party\libstemmer_c\src_c\stem_ISO_8859_1_italian.c"></ClCompile>
+    <ClCompile Include="src\third_party\libstemmer_c\src_c\stem_ISO_8859_1_spanish.c"></ClCompile>
+    <ClCompile Include="src\third_party\libstemmer_c\src_c\stem_UTF_8_danish.c"></ClCompile>
+    <ClCompile Include="src\third_party\libstemmer_c\src_c\stem_UTF_8_french.c"></ClCompile>
+    <ClCompile Include="src\third_party\libstemmer_c\src_c\stem_UTF_8_norwegian.c"></ClCompile>
+    <ClCompile Include="src\third_party\libstemmer_c\src_c\stem_UTF_8_russian.c"></ClCompile>
+    <ClCompile Include="src\third_party\murmurhash3\MurmurHash3.cpp"></ClCompile>
+    <ClCompile Include="src\third_party\pcre-8.30\pcre_byte_order.c"><PreprocessorDefinitions>HAVE_CONFIG_H;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\pcre-8.30\pcre_compile.c"><PreprocessorDefinitions>HAVE_CONFIG_H;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\pcre-8.30\pcre_config.c"><PreprocessorDefinitions>HAVE_CONFIG_H;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\pcre-8.30\pcre_dfa_exec.c"><PreprocessorDefinitions>HAVE_CONFIG_H;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\pcre-8.30\pcre_exec.c"><PreprocessorDefinitions>HAVE_CONFIG_H;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\pcre-8.30\pcre_fullinfo.c"><PreprocessorDefinitions>HAVE_CONFIG_H;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\pcre-8.30\pcre_get.c"><PreprocessorDefinitions>HAVE_CONFIG_H;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\pcre-8.30\pcre_globals.c"><PreprocessorDefinitions>HAVE_CONFIG_H;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\pcre-8.30\pcre_maketables.c"><PreprocessorDefinitions>HAVE_CONFIG_H;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\pcre-8.30\pcre_newline.c"><PreprocessorDefinitions>HAVE_CONFIG_H;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\pcre-8.30\pcre_ord2utf8.c"><PreprocessorDefinitions>HAVE_CONFIG_H;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\pcre-8.30\pcre_refcount.c"><PreprocessorDefinitions>HAVE_CONFIG_H;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\pcre-8.30\pcre_string_utils.c"><PreprocessorDefinitions>HAVE_CONFIG_H;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\pcre-8.30\pcre_study.c"><PreprocessorDefinitions>HAVE_CONFIG_H;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\pcre-8.30\pcre_tables.c"><PreprocessorDefinitions>HAVE_CONFIG_H;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\pcre-8.30\pcre_ucd.c"><PreprocessorDefinitions>HAVE_CONFIG_H;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\pcre-8.30\pcre_valid_utf8.c"><PreprocessorDefinitions>HAVE_CONFIG_H;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\pcre-8.30\pcre_version.c"><PreprocessorDefinitions>HAVE_CONFIG_H;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\pcre-8.30\pcre_xclass.c"><PreprocessorDefinitions>HAVE_CONFIG_H;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\pcre-8.30\pcre_chartables.c"><PreprocessorDefinitions>HAVE_CONFIG_H;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\pcre-8.30\pcrecpp.cc"><PreprocessorDefinitions>HAVE_CONFIG_H;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\pcre-8.30\pcre_scanner.cc"><PreprocessorDefinitions>HAVE_CONFIG_H;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\pcre-8.30\pcre_stringpiece.cc"><PreprocessorDefinitions>HAVE_CONFIG_H;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\pcre-8.30\pcreposix.c"><PreprocessorDefinitions>HAVE_CONFIG_H;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\s2\base\int128.cc"></ClCompile>
+    <ClCompile Include="src\third_party\s2\base\logging.cc"></ClCompile>
+    <ClCompile Include="src\third_party\s2\base\stringprintf.cc"></ClCompile>
+    <ClCompile Include="src\third_party\s2\base\strtoint.cc"></ClCompile>
+    <ClCompile Include="src\third_party\s2\s1angle.cc"><PreprocessorDefinitions>DEBUG_MODE=false;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\s2\s2.cc"><PreprocessorDefinitions>DEBUG_MODE=false;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\s2\s2cellid.cc"><PreprocessorDefinitions>DEBUG_MODE=false;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\s2\s2latlng.cc"><PreprocessorDefinitions>DEBUG_MODE=false;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\s2\s1interval.cc"><PreprocessorDefinitions>DEBUG_MODE=false;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\s2\s2cap.cc"><PreprocessorDefinitions>DEBUG_MODE=false;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\s2\s2cell.cc"><PreprocessorDefinitions>DEBUG_MODE=false;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\s2\s2cellunion.cc"><PreprocessorDefinitions>DEBUG_MODE=false;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\s2\s2edgeindex.cc"><PreprocessorDefinitions>DEBUG_MODE=false;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\s2\s2edgeutil.cc"><PreprocessorDefinitions>DEBUG_MODE=false;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\s2\s2latlngrect.cc"><PreprocessorDefinitions>DEBUG_MODE=false;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\s2\s2loop.cc"><PreprocessorDefinitions>DEBUG_MODE=false;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\s2\s2pointregion.cc"><PreprocessorDefinitions>DEBUG_MODE=false;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\s2\s2polygon.cc"><PreprocessorDefinitions>DEBUG_MODE=false;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\s2\s2polygonbuilder.cc"><PreprocessorDefinitions>DEBUG_MODE=false;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\s2\s2polyline.cc"><PreprocessorDefinitions>DEBUG_MODE=false;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\s2\s2r2rect.cc"><PreprocessorDefinitions>DEBUG_MODE=false;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\s2\s2region.cc"><PreprocessorDefinitions>DEBUG_MODE=false;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\s2\s2regioncoverer.cc"><PreprocessorDefinitions>DEBUG_MODE=false;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\s2\s2regionintersection.cc"><PreprocessorDefinitions>DEBUG_MODE=false;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\s2\s2regionunion.cc"><PreprocessorDefinitions>DEBUG_MODE=false;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\s2\strings\split.cc"></ClCompile>
+    <ClCompile Include="src\third_party\s2\strings\stringprintf.cc"></ClCompile>
+    <ClCompile Include="src\third_party\s2\strings\strutil.cc"></ClCompile>
+    <ClCompile Include="src\third_party\s2\util\coding\coder.cc"></ClCompile>
+    <ClCompile Include="src\third_party\s2\util\coding\varint.cc"></ClCompile>
+    <ClCompile Include="src\third_party\s2\util\math\mathutil.cc"></ClCompile>
+    <ClCompile Include="src\third_party\shim_allocator.cpp"></ClCompile>
+    <ClCompile Include="src\third_party\shim_boost.cpp"></ClCompile>
+    <ClCompile Include="src\third_party\shim_pcrecpp.cc"></ClCompile>
+    <ClCompile Include="src\third_party\shim_snappy.cpp"></ClCompile>
+    <ClCompile Include="src\third_party\shim_stemmer.cpp"></ClCompile>
+    <ClCompile Include="src\third_party\shim_v8.cpp"></ClCompile>
+    <ClCompile Include="src\third_party\shim_yaml.cpp"></ClCompile>
+    <ClCompile Include="src\third_party\snappy\snappy.cc"></ClCompile>
+    <ClCompile Include="src\third_party\snappy\snappy-sinksource.cc"></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\x64\assembler-x64.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\x64\builtins-x64.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\x64\code-stubs-x64.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\x64\codegen-x64.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\x64\cpu-x64.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\x64\debug-x64.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\x64\deoptimizer-x64.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\x64\disasm-x64.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\x64\frames-x64.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\x64\full-codegen-x64.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\x64\ic-x64.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\x64\lithium-codegen-x64.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\x64\lithium-gap-resolver-x64.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\x64\lithium-x64.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\x64\macro-assembler-x64.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\x64\regexp-macro-assembler-x64.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\x64\stub-cache-x64.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\platform-win32.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\win32-math.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\objects-debug.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\prettyprinter.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\regexp-macro-assembler-tracer.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\accessors.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\allocation.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\api.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\assembler.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\ast.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\atomicops_internals_x86_gcc.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\bignum-dtoa.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\bignum.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\bootstrapper.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\builtins.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\cached-powers.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\checks.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\circular-queue.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\code-stubs.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\codegen.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\compilation-cache.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\compiler.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\contexts.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\conversions.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\counters.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\cpu-profiler.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\data-flow.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\date.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\dateparser.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\debug-agent.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\debug.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\deoptimizer.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\disassembler.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\diy-fp.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\dtoa.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\elements-kind.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\elements.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\execution.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\extensions\externalize-string-extension.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\extensions\gc-extension.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\extensions\statistics-extension.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\factory.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\fast-dtoa.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\fixed-dtoa.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\flags.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\frames.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\full-codegen.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\func-name-inferrer.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\gdb-jit.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\global-handles.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\handles.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\heap-profiler.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\heap.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\hydrogen-instructions.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\hydrogen.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\ic.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\incremental-marking.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\inspector.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\interface.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\interpreter-irregexp.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\isolate.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\jsregexp.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\lithium-allocator.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\lithium.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\liveedit.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\liveobjectlist.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\log-utils.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\log.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\mark-compact.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\messages.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\objects-printer.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\objects-visiting.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\objects.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\once.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\optimizing-compiler-thread.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\parser.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\preparse-data.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\preparser.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\profile-generator.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\property.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\regexp-macro-assembler-irregexp.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\regexp-macro-assembler.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\regexp-stack.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\rewriter.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\runtime-profiler.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\runtime.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\safepoint-table.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\scanner-character-streams.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\scanner.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\scopeinfo.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\scopes.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\serialize.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\snapshot-common.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\spaces.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\store-buffer.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\string-search.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\string-stream.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\strtod.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\stub-cache.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\token.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\transitions.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\type-info.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\unicode.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\utils.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\v8-counters.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\v8.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\v8conversions.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\v8threads.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\v8utils.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\variables.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\version.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\zone.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\v8\src\snapshot-empty.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\yaml-cpp-0.5.1\src\binary.cpp"></ClCompile>
+    <ClCompile Include="src\third_party\yaml-cpp-0.5.1\src\graphbuilder.cpp"></ClCompile>
+    <ClCompile Include="src\third_party\yaml-cpp-0.5.1\src\graphbuilderadapter.cpp"></ClCompile>
+    <ClCompile Include="src\third_party\yaml-cpp-0.5.1\src\convert.cpp"></ClCompile>
+    <ClCompile Include="build\win32\64\d\third_party\v8\src\experimental-libraries.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile Include="src\third_party\yaml-cpp-0.5.1\src\directives.cpp"></ClCompile>
+    <ClCompile Include="src\third_party\yaml-cpp-0.5.1\src\emit.cpp"></ClCompile>
+    <ClCompile Include="src\third_party\yaml-cpp-0.5.1\src\emitfromevents.cpp"></ClCompile>
+    <ClCompile Include="src\third_party\yaml-cpp-0.5.1\src\emitter.cpp"></ClCompile>
+    <ClCompile Include="src\third_party\yaml-cpp-0.5.1\src\emitterstate.cpp"></ClCompile>
+    <ClCompile Include="src\third_party\yaml-cpp-0.5.1\src\emitterutils.cpp"></ClCompile>
+    <ClCompile Include="src\third_party\yaml-cpp-0.5.1\src\exp.cpp"></ClCompile>
+    <ClCompile Include="src\third_party\yaml-cpp-0.5.1\src\memory.cpp"></ClCompile>
+    <ClCompile Include="src\third_party\yaml-cpp-0.5.1\src\node.cpp"></ClCompile>
+    <ClCompile Include="src\third_party\yaml-cpp-0.5.1\src\node_data.cpp"></ClCompile>
+    <ClCompile Include="src\third_party\yaml-cpp-0.5.1\src\nodebuilder.cpp"></ClCompile>
+    <ClCompile Include="src\third_party\yaml-cpp-0.5.1\src\nodeevents.cpp"></ClCompile>
+    <ClCompile Include="src\third_party\yaml-cpp-0.5.1\src\null.cpp"></ClCompile>
+    <ClCompile Include="src\third_party\yaml-cpp-0.5.1\src\ostream_wrapper.cpp"></ClCompile>
+    <ClCompile Include="src\third_party\yaml-cpp-0.5.1\src\parse.cpp"></ClCompile>
+    <ClCompile Include="src\third_party\yaml-cpp-0.5.1\src\parser.cpp"></ClCompile>
+    <ClCompile Include="src\third_party\yaml-cpp-0.5.1\src\regex.cpp"></ClCompile>
+    <ClCompile Include="src\third_party\yaml-cpp-0.5.1\src\scanner.cpp"></ClCompile>
+    <ClCompile Include="src\third_party\yaml-cpp-0.5.1\src\scanscalar.cpp"></ClCompile>
+    <ClCompile Include="src\third_party\yaml-cpp-0.5.1\src\scantag.cpp"></ClCompile>
+    <ClCompile Include="src\third_party\yaml-cpp-0.5.1\src\scantoken.cpp"></ClCompile>
+    <ClCompile Include="src\third_party\yaml-cpp-0.5.1\src\simplekey.cpp"></ClCompile>
+    <ClCompile Include="src\third_party\yaml-cpp-0.5.1\src\singledocparser.cpp"></ClCompile>
+    <ClCompile Include="src\third_party\yaml-cpp-0.5.1\src\stream.cpp"></ClCompile>
+    <ClCompile Include="src\third_party\yaml-cpp-0.5.1\src\tag.cpp"></ClCompile>
+    <ClCompile Include="build\win32\64\d\third_party\v8\src\libraries.cc"><AdditionalIncludeDirectories>src\third_party\v8\src;</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;V8_ENABLE_CHECKS;ENABLE_DEBUGGER_SUPPORT;ENABLE_DISASSEMBLER;OBJECT_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="src\mongo\db\mongo.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ResourceCompile Include="src\mongo\db\db.rc" />
+  </ItemGroup>
+
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets"></ImportGroup>
+</Project>
+
